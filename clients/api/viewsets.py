@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from clients.models import Client
 from .serializers import ClientSerializer
+from accounts.api.serializers import UserSerializer
 
 class ClientViewSet(viewsets.ViewSet):
     def list(self, request):
@@ -12,10 +13,11 @@ class ClientViewSet(viewsets.ViewSet):
         user = Token.objects.get(key=user_token).user
         
         # filtering the clients base on the user
-        queryset = Client.objects.all().filter(costumer=user)
+        queryset = Client.objects.all().filter(customer=user)
         serializer = ClientSerializer(queryset, many=True)
 
         return Response(serializer.data)
+
 
     def retrieve(self, request, pk):
         client = Client.objects.get(pk=pk)
@@ -30,7 +32,7 @@ class ClientViewSet(viewsets.ViewSet):
         user = Token.objects.get(key=user_token).user
 
         # checking if the right user is sending request
-        if user == client.costumer:
+        if user == client.customer:
             return Response(serializer.data)
         else:
             response = {
@@ -40,3 +42,55 @@ class ClientViewSet(viewsets.ViewSet):
 
             return Response(response, status=HTTP_400_BAD_REQUEST)
 
+    
+    def create(self, request):
+        # getting the user who is sending request
+        user_token = request.auth
+        user = Token.objects.get(key=user_token).user
+
+        # create new client
+        data = {
+            'customer': user,
+            'first_name': request.data.get('first_name'),
+            'last_name': request.data.get('last_name'),
+            'email': request.data.get('email'),
+            'phone': request.data.get('phone'),
+            'balance': float(request.data.get('balance'))
+        }
+
+        serializer = ClientSerializer(data=data)
+        
+        if serializer.is_valid(raise_exception=True):
+            Client.objects.create(**data)
+            return Response(serializer.data, status=HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+    def update(self, request, pk=None):
+        # getting the user who is sending request
+        user_token = request.auth
+        user = Token.objects.get(key=user_token).user
+
+        data = {
+            'customer': user,
+            'first_name': request.data.get('first_name'),
+            'last_name': request.data.get('last_name'),
+            'email': request.data.get('email'),
+            'phone': request.data.get('phone'),
+            'balance': float(request.data.get('balance'))
+        }
+
+        serializer = ClientSerializer(data=data)
+    
+        if serializer.is_valid(raise_exception=True):
+            client = Client.objects.get(pk=pk)
+            client.__dict__.update(**data)
+            client.save()
+            return Response(serializer.data, status=HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+        def destroy(self, request, pk=None):
+            pass

@@ -92,5 +92,16 @@ class ClientViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
-        def destroy(self, request, pk=None):
-            pass
+    def destroy(self, request, pk=None):
+        # getting the client
+        client = Client.objects.get(pk=pk)
+
+        # deleting the client
+        client.delete()
+
+        response = {
+            'message': f'Client {client.first_name} with the id of {client.id} has been deleted',
+            'success': True
+        }
+
+        return Response(response, HTTP_200_OK)

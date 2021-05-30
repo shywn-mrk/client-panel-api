@@ -114,6 +114,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
 # Rest Framework Settings
 
 REST_FRAMEWORK = {

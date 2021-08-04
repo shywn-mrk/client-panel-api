@@ -2,7 +2,7 @@
 Make sure you have Python >= 3.8 installed before following these steps.
 
 1 - Clone the project:
-`git clone https://github.com/shywn-mrk/shiny-winner.git`
+`git clone https://github.com/shywn-mrk/client-panel-api.git`
 
 2 - Create a virtual environment:
 `python -m venv env`
